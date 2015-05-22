@@ -1,0 +1,23 @@
+{
+  "name": "dagmise",
+  "version": "1.0.0",
+  "description": "Directed acyclic graphs of promises.",
+  "main": "dagmise.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/spelufo/dagmise"
+  },
+  "author": "Santiago Pelufo <santiagopelufo@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/spelufo/dagmise/issues"
+  },
+  "homepage": "https://github.com/spelufo/dagmise",
+  "dependencies": {
+    "dager": "^1.0.1",
+    "when": "^3.7.3"
+  }
+}
