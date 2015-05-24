@@ -2,15 +2,6 @@ var when = require('when');
 var util = require('util');
 var dager = require('dager');
 
-// function mapValsBasedOn (obj, f) {
-// 	var r = {};
-// 	Object.keys(obj).forEach(function (k) {
-// 		r[k] = f(k);
-// 	});
-// 	return r;
-// }
-
-
 function DAG () {
 	dager.DAG.call(this);
 	this._tasks = {};
@@ -25,12 +16,11 @@ DAG.prototype.task = function (node, task) {
 }
 
 DAG.prototype.run = function (target) {
-	// The problem with this is that it probably calls some nodes' tasks more than once.
-	// For example in graphs like: A -> B -> C; A -> C; it will run C twice.
-	// return when.all(Object.keys(this.to(target)).map(make))
-	// 	.then(this.node(target), console.error);
-	
-	this.make(target).then(this.reset);
+	var dag = this;
+	return this.make(target).then(function (result) {
+		dag.reset();
+		return result;		
+	});
 };
 
 DAG.prototype.make = function (target) {

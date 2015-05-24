@@ -55,55 +55,50 @@ dag.task('d', function (deps) {
 
 assert.deepEqual(dag._nodes, dag._tasks);
 
-dag.make('d')
-	.then(function (result) {
+dag.make('d').then(function (result) {
+	assert.deepEqual(result, {object: 42});
+	assert.deepEqual(count, { a: 1, b: 1, c: 1, d: 1 });
+
+}).then(function (result) {
+	// this second make does nothing, cause all things are built already.
+	assert(when.isPromiseLike(dag.node('a')));
+	assert(when.isPromiseLike(dag.node('d')));
+
+	return dag.make('d').then(function (result) {
 		assert.deepEqual(result, {object: 42});
-		assert(count.a === 1);
-		assert(count.b === 1);
-		assert(count.c === 1);
-		assert(count.d === 1);
-	}).then(function (result) {
-		// this second make does nothing, cause all things are built already.
+		assert.deepEqual(count, { a: 1, b: 1, c: 1, d: 1 });
+
 		assert(when.isPromiseLike(dag.node('a')));
 		assert(when.isPromiseLike(dag.node('d')));
 
-		return dag.make('d').then(function (result) {
-			assert.deepEqual(result, {object: 42});
-			assert(count.a === 1);
-			assert(count.b === 1);
-			assert(count.c === 1);
-			assert(count.d === 1);
+		dag.reset();
 
-			assert(when.isPromiseLike(dag.node('a')));
-			assert(when.isPromiseLike(dag.node('d')));
-
-			// revert all tasks as unrun;
-			dag.reset();
-
-			assert(dag.node('a') === atask);
-			assert(typeof dag.node('d') === 'function');
-			
-		});
-	}).then(function () {
-
-		dag.add('a', 'c');
+		assert(dag.node('a') === atask);
+		assert(typeof dag.node('d') === 'function');
 		
-		return dag.make('d').then(function (result) {
-			assert.deepEqual(result, {object: 42});
-			assert(count.a === 2);
-			assert(count.b === 2);
-			assert(count.c === 2);
-			assert(count.d === 2);
-
-			// revert b task as unrun;
-			dag.update('b');
-		});
-	}).then(function () {
-		return dag.make('d').then(function (result) {
-			assert.deepEqual(result, {object: 42});
-			assert(count.a === 2);
-			assert(count.b === 3);
-			assert(count.c === 2);
-			assert(count.d === 3);
-		});
 	});
+}).then(function () {
+
+	dag.add('a', 'c');
+	
+	return dag.make('d').then(function (result) {
+		assert.deepEqual(result, {object: 42});
+		assert.deepEqual(count, { a: 2, b: 2, c: 2, d: 2 });
+
+	});
+}).then(function () {
+
+	dag.update('b');
+
+	return dag.make('d').then(function (result) {
+		assert.deepEqual(result, {object: 42});
+		assert.deepEqual(count, { a: 2, b: 3, c: 2, d: 3 });
+	});
+}).then(function () {
+	return dag.run('c').then(function (result) {
+		assert.deepEqual(result, 42);
+		assert.deepEqual(count, { a: 2, b: 3, c: 2, d: 3 });
+		assert(dag.node('a') === atask);
+		assert(typeof dag.node('d') === 'function');
+	});
+});
