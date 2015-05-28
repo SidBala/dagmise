@@ -5,6 +5,7 @@ var dager = require('dager');
 function DAG () {
 	dager.DAG.call(this);
 	this._tasks = {};
+	this._making = {};
 }
 
 util.inherits(DAG, dager.DAG);
@@ -19,11 +20,24 @@ DAG.prototype.run = function (target) {
 	var dag = this;
 	return this.make(target).then(function (result) {
 		dag.reset();
-		return result;		
+		return result;
 	});
 };
 
 DAG.prototype.make = function (target) {
+	var dag = this;
+	if (!dag.node(target))
+		return when.reject(new Error('Cannot make missing target '+ target));
+
+	dag._making[target] = target;
+	return dag._make(target)
+		.then(function (result) {
+			delete dag._making[target];
+			return result;
+		});
+}
+
+DAG.prototype._make = function (target) {
 
 	var promiser = this.node(target);
 	var promise = promiser;
@@ -44,13 +58,22 @@ DAG.prototype.make = function (target) {
 };
 
 DAG.prototype.update = function (source) {
+	var making;
+	if ((making = Object.keys(this._making)).length)
+		return when.reject(new Error('Cannot update while making targets: ' + making.join(' ')));
+
 	this.node(source, this._tasks[source]);
 	return when.all(Object.keys(this.from(source)).map(this.update.bind(this)));
 };
 
-DAG.prototype.reset = function () {
+DAG.prototype.reset = function (res) {
+	var making;
+	if (making = Object.keys(this._making).length)
+		return when.reject(new Error('Cannot update while making targets: ' + making.join(' ')));
+
 	for (var t in this._tasks)
 		this.node(t, this._tasks[t]);
+	return when.resolve(res);
 };
 
 
