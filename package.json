@@ -1,6 +1,6 @@
 {
   "name": "dagmise",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Directed acyclic graph of promises.",
   "main": "dagmise.js",
   "scripts": {
