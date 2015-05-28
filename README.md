@@ -42,4 +42,4 @@ Then you can run `dag.make('index.html')` to get a pending promise that will be 
 
 When a task is executed when walking the graph for dependencies, the node's value (see [dager](https://github.com/spelufo/dager)) is replaced by the promise, so subsequent visits to the node will not trigger repeated execution of the task, instead they will yield the same promise it gave the first time. For this reason, running make again will produce the same value, without reexecution of any of the tasks.
 
-`dag.update('node')` will revert the node's task and those of the nodes that depend on that task to their unrun starting state. `dag.reset()` will revert all the nodes. This methods only succeed if there are no "makes" in progress. They return a promise that will be rejected if a make is in progress, and resolved if they updated the graph successfully.
+`dag.update('node')` will revert the node's task and those of the nodes that depend on that task to their unrun starting state. `dag.reset()` will revert all the nodes. These methods only succeed if there are no "makes" in progress. Their return value is a boolean indicating success or failure.

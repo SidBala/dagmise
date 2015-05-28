@@ -11,9 +11,26 @@ function DAG () {
 util.inherits(DAG, dager.DAG);
 
 
-DAG.prototype.task = function (node, task) {
-	this._tasks[node] = task;
-	this.node(node, task);
+DAG.prototype.task = function (node, deps, task) {
+
+	var dag = this;
+
+	if (arguments.length < 3) {
+		task = deps;
+		deps = [];
+	}
+
+	if (typeof deps === 'string') deps = [deps];
+
+	deps.forEach(function (dep) {
+		dag.edge(dep, node, dag.get(dep, node));
+	});
+
+	this.node(node, this._tasks[node] = function (res) {
+		var args = [node].concat(deps.map(function (d) { return res[d] }));
+		return task.apply(null, args);
+	});
+
 }
 
 DAG.prototype.run = function (target) {
@@ -26,7 +43,7 @@ DAG.prototype.run = function (target) {
 
 DAG.prototype.make = function (target) {
 	var dag = this;
-	if (!dag.node(target))
+	if (!dag.get(target))
 		return when.reject(new Error('Cannot make missing target '+ target));
 
 	dag._making[target] = target;
@@ -39,7 +56,7 @@ DAG.prototype.make = function (target) {
 
 DAG.prototype._make = function (target) {
 
-	var promiser = this.node(target);
+	var promiser = this.get(target);
 	var promise = promiser;
 
 	if (!when.isPromiseLike(promiser)) {
@@ -58,22 +75,24 @@ DAG.prototype._make = function (target) {
 };
 
 DAG.prototype.update = function (source) {
-	var making;
-	if ((making = Object.keys(this._making)).length)
-		return when.reject(new Error('Cannot update while making targets: ' + making.join(' ')));
+	var dag = this;
 
-	this.node(source, this._tasks[source]);
-	return when.all(Object.keys(this.from(source)).map(this.update.bind(this)));
+	if (Object.keys(dag._making).length) return false;
+
+	dag.node(source, dag._tasks[source]);
+	Object.keys(dag.from(source)).forEach(function (node) {
+		dag.update(node);
+	});
+
+	return true;
 };
 
 DAG.prototype.reset = function (res) {
-	var making;
-	if (making = Object.keys(this._making).length)
-		return when.reject(new Error('Cannot update while making targets: ' + making.join(' ')));
+	if (Object.keys(this._making).length) return false;
 
 	for (var t in this._tasks)
 		this.node(t, this._tasks[t]);
-	return when.resolve(res);
+	return true;
 };
 
 

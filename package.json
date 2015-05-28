@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/spelufo/dagmise",
   "dependencies": {
-    "dager": "^1.0.1",
+    "dager": "^2.0.0",
     "when": "^3.7.3"
   }
 }
