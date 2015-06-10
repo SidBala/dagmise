@@ -67,7 +67,7 @@ DAG.prototype._make = function (target) {
 				for (var i = 0; i < depnodes.length; i++)
 					deps[depnodes[i]] = depvals[i];
 				return promiser(deps);
-			}, console.error);
+			});
 	}
 	
 	this.node(target, promise);
