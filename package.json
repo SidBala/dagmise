@@ -1,6 +1,6 @@
 {
-  "name": "dagmise",
-  "version": "2.0.1",
+  "name": "dagmise2",
+  "version": "2.0.2",
   "description": "Directed acyclic graph of promises.",
   "main": "dagmise.js",
   "scripts": {
@@ -8,16 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/spelufo/dagmise"
+    "url": "github.com/SidBala/dagmise"
   },
   "author": "Santiago Pelufo <santiagopelufo@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/spelufo/dagmise/issues"
+    "url": "https://github.com/SidBala/dagmise/issues"
   },
-  "homepage": "https://github.com/spelufo/dagmise",
+  "homepage": "https://github.com/SidBala/dagmise",
   "dependencies": {
-    "dager": "^2.0.0",
-    "when": "^3.7.3"
+    "bluebird": "^2.9.27",
+    "dager": "^2.0.0"
+  },
+  "devDependencies": {
+    "log-colors": "^1.0.0"
   }
 }

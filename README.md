@@ -26,7 +26,9 @@ dag.task('index.html', ['contents.md', 'template.jade'],
         return fs.writeFile(target, template({ contents: contents }));
     });
 
-dag.make('index.html');
+dag.make('index.html')
+.then(console.log)
+.catch(console.error);
 ```
 
 
