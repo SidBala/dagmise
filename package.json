@@ -1,5 +1,5 @@
 {
-  "name": "dagmise2",
+  "name": "dogmise",
   "version": "2.0.2",
   "description": "Directed acyclic graph of promises.",
   "main": "dagmise.js",
